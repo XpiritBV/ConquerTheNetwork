@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ConquerTheNetwork.Views.CityDetailView"
+             Title="{Binding Name}">
+  <StackLayout Padding="5" Spacing="10">
+    <Label Text="{Binding Name}" HorizontalOptions="CenterAndExpand" XAlign="Center" FontSize="20"></Label>
+    <Image WidthRequest="111" HeightRequest="111" Source="{Binding ImageUrl}"></Image>
+    <Button Text="View Schedule" Command="{Binding ViewScheduleCommand}"></Button>
+  </StackLayout>
+</ContentPage>
