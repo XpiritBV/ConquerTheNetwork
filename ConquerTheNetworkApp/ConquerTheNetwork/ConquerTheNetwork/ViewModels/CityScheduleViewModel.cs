@@ -94,7 +94,7 @@ namespace ConquerTheNetwork.ViewModels
                                      });
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 ServiceError = true;
             }
