@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using ConquerTheNetwork.Data;
 using Refit;
 using System.Net;
+using ModernHttpClient;
+using System.Net.Http;
+using System;
 
 namespace ConquerTheNetwork.Services
 {
@@ -14,7 +17,12 @@ namespace ConquerTheNetwork.Services
 
         public ServiceClient()
         {
-            _client = RestService.For<IConferenceApi>(ApiBaseAddress);
+            var client = new HttpClient(new NativeMessageHandler())
+            {
+                BaseAddress = new Uri(ApiBaseAddress)
+            };
+            _client = RestService.For<IConferenceApi>(client);
+
         }
 
         public async Task<List<City>> GetCities()
