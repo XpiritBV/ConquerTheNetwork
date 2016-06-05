@@ -5,6 +5,7 @@ using Xamarin.Forms;
 using ConquerTheNetwork.Data;
 using Akavache;
 using System;
+using Plugin.Connectivity;
 
 namespace ConquerTheNetwork.ViewModels
 {
@@ -29,6 +30,13 @@ namespace ConquerTheNetwork.ViewModels
 
         public void GetCities(bool force = false)
         {
+            if (!CrossConnectivity.Current.IsConnected && force)
+            {
+                // Optionally, you can show a warning saying 
+                // the client is not connected
+                return;
+            }
+
             var cache = BlobCache.LocalMachine;
             var cachedCities = cache.GetAndFetchLatest("cities", GetRemoteCitiesAsync,
                 offset =>

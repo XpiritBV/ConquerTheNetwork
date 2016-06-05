@@ -4,6 +4,7 @@ using ConquerTheNetwork.Data;
 using ConquerTheNetwork.Services;
 using Xamarin.Forms;
 using System.Collections.ObjectModel;
+using Plugin.Connectivity;
 
 namespace ConquerTheNetwork.ViewModels
 {
@@ -54,6 +55,13 @@ namespace ConquerTheNetwork.ViewModels
 
         public async Task GetSchedule()
         {
+            if (!CrossConnectivity.Current.IsConnected)
+            {
+                // Optionally, you can show a warning saying 
+                // the client is not connected
+                return;
+            }
+
             var client = new ServiceClient();
 			var schedule = await client.GetScheduleForCity (_cityId);
 

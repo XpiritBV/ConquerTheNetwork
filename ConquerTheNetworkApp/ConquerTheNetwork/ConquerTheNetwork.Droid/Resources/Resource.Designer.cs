@@ -26,6 +26,7 @@ namespace ConquerTheNetwork.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::ModernHttpClient.Resource.String.library_name = global::ConquerTheNetwork.Droid.Resource.String.library_name;
 			global::Splat.Resource.String.library_name = global::ConquerTheNetwork.Droid.Resource.String.library_name;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::ConquerTheNetwork.Droid.Resource.Attribute.actionBarSize;
 		}
