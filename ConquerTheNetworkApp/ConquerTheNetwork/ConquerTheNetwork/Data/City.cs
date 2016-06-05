@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ConquerTheNetwork.Services;
+using System;
 
 namespace ConquerTheNetwork.Data
 {
@@ -10,6 +11,7 @@ namespace ConquerTheNetwork.Data
         public string Logo { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public DateTime LastUpdated { get; set; }
 
         [JsonIgnore]
         public string ImageUrl

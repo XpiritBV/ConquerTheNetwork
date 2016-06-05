@@ -13,7 +13,12 @@ namespace VSLiveSampleService.Controllers
         // GET: api/cities
         public IEnumerable<City> Get()
         {
-            return MockDatabase.Cities;
+            var cities = MockDatabase.Cities;
+            foreach (var city in cities)
+            {
+                city.LastUpdated = DateTime.Now;
+            }
+            return cities;
         }
 
         // GET api/cities/5
@@ -21,7 +26,9 @@ namespace VSLiveSampleService.Controllers
         {
             if (MockDatabase.Cities.Any(c => c.Id == id))
             {
-                return MockDatabase.Cities.FirstOrDefault(c => c.Id == id);
+                var city = MockDatabase.Cities.FirstOrDefault(c => c.Id == id);
+                city.LastUpdated = DateTime.Now;
+                return city;
             }
 
             var resp = new HttpResponseMessage(HttpStatusCode.NotFound)

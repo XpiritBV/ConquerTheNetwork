@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using ConquerTheNetwork.Services;
 using Xamarin.Forms;
 using ConquerTheNetwork.Data;
+using Akavache;
+using System;
 
 namespace ConquerTheNetwork.ViewModels
 {
@@ -14,21 +16,37 @@ namespace ConquerTheNetwork.ViewModels
             get
             {
                 return refreshCommand ??
-                    (refreshCommand = new Command(async () => await ExecuteRefreshCommand(), () => !IsLoading));
+                    (refreshCommand = new Command(() => ExecuteRefreshCommand(), () => !IsLoading));
             }
         }
 
-        private async Task ExecuteRefreshCommand()
+        private void ExecuteRefreshCommand()
         {
             IsLoading = true;
-            await GetCities();
+            GetCities(force: true);
             IsLoading = false;
         }
 
-        public async Task GetCities()
+        public void GetCities(bool force = false)
+        {
+            var cache = BlobCache.LocalMachine;
+            var cachedCities = cache.GetAndFetchLatest("cities", GetRemoteCitiesAsync,
+                offset =>
+                {
+                    TimeSpan elapsed = DateTimeOffset.Now - offset;
+                    return force || elapsed > new TimeSpan(hours: 0, minutes: 30, seconds: 0);
+                })
+                .Subscribe((cities) =>
+                {
+                    Cities = cities;
+                });
+        }
+
+        private async Task<List<City>> GetRemoteCitiesAsync()
         {
             var client = new ServiceClient();
-            Cities = await client.GetCities();
+            var cities = await client.GetCities();
+            return cities;
         }
 
         private IEnumerable<City> _cities;

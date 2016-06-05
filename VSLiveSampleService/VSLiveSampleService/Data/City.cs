@@ -12,5 +12,6 @@ namespace VSLiveSampleService.Data
         public string Logo { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public DateTime LastUpdated { get; set; }
     }
 }
