@@ -5,6 +5,7 @@ using ConquerTheNetwork.Services;
 using Xamarin.Forms;
 using System.Collections.ObjectModel;
 using Plugin.Connectivity;
+using System;
 
 namespace ConquerTheNetwork.ViewModels
 {
@@ -53,6 +54,20 @@ namespace ConquerTheNetwork.ViewModels
             IsLoading = false;
         }
 
+        private bool _serviceError;
+        public bool ServiceError
+        {
+            get { return _serviceError; }
+            set
+            {
+                if (_serviceError != value)
+                {
+                    _serviceError = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public async Task GetSchedule()
         {
             if (!CrossConnectivity.Current.IsConnected)
@@ -62,20 +77,27 @@ namespace ConquerTheNetwork.ViewModels
                 return;
             }
 
-            var client = new ServiceClient();
-			var schedule = await client.GetScheduleForCity (_cityId);
+            try
+            {
+                var client = new ServiceClient();
+                var schedule = await client.GetScheduleForCity(_cityId);
 
-			if (schedule != null)
-			{
-			    await Task.Run(() => from slot in schedule.Slots
-			        orderby slot.StartTime
-			        group slot by slot.DayFormatted
-			        into slotGroup
-			        select new Grouping<string, Slot>(slotGroup.Key, slotGroup)).ContinueWith(r =>
-			    {
-			        GroupedSlots = new ObservableCollection<Grouping<string, Slot>>(r.Result);
-			    });
-			}
+                if (schedule != null)
+                {
+                    await Task.Run(() => from slot in schedule.Slots
+                                         orderby slot.StartTime
+                                         group slot by slot.DayFormatted
+                        into slotGroup
+                                         select new Grouping<string, Slot>(slotGroup.Key, slotGroup)).ContinueWith(r =>
+                                     {
+                                         GroupedSlots = new ObservableCollection<Grouping<string, Slot>>(r.Result);
+                                     });
+                }
+            }
+            catch (Exception e)
+            {
+                ServiceError = true;
+            }
         }
     }
 }

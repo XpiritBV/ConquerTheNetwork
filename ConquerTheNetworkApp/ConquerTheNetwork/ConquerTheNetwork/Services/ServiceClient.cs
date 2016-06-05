@@ -6,6 +6,8 @@ using System.Net;
 using ModernHttpClient;
 using System.Net.Http;
 using System;
+using Polly;
+using System.Diagnostics;
 
 namespace ConquerTheNetwork.Services
 {
@@ -27,14 +29,31 @@ namespace ConquerTheNetwork.Services
 
         public async Task<List<City>> GetCities()
         {
-            return await _client.GetCities();
+            return await Policy
+                .Handle<ApiException>(ex => ex.StatusCode != HttpStatusCode.NotFound)
+                .CircuitBreakerAsync(exceptionsAllowedBeforeBreaking: 2, durationOfBreak: TimeSpan.FromMinutes(1))
+                .ExecuteAsync(async () =>
+                {
+                    Debug.WriteLine("Trying cities service call...");
+                    return await _client.GetCities();
+                });
         }
 
         public async Task<Schedule> GetScheduleForCity(string id)
         {
             try
             {
-                return await _client.GetScheduleForCity(id);
+                return await Policy
+                        .Handle<ApiException>(ex => ex.StatusCode != HttpStatusCode.NotFound)
+                        .WaitAndRetryAsync
+                        (
+                            retryCount: 3,
+                            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                        )
+                        .ExecuteAsync(async () => {
+                            Debug.WriteLine("Trying schedule service call...");
+                            return await _client.GetScheduleForCity(id);
+                        });
             }
             catch (ApiException ex)
             {

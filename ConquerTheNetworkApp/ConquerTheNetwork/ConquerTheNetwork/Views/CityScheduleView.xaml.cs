@@ -24,11 +24,30 @@ namespace ConquerTheNetwork.Views
             ViewModel = viewModel;
         }
 
+        private async void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ServiceError")
+            {
+                if (ViewModel.ServiceError)
+                {
+                    await this.DisplayAlert("Error", "Something went wrong :-(", "OK");
+                    ViewModel.ServiceError = false;
+                }
+            }
+        }
+
         protected async override void OnAppearing()
         {
             base.OnAppearing();
 
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             await ViewModel.GetSchedule();
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
         }
 
         public void Schedule_OnItemSelected(object sender, SelectedItemChangedEventArgs e)

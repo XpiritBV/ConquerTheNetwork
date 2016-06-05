@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Web.Http;
 using VSLiveSampleService.Data;
 
@@ -19,8 +20,23 @@ namespace VSLiveSampleService.Controllers
         // GET: api/schedule/{id}
         public Schedule Get(string id)
         {
+            var second = DateTime.UtcNow.Second;
+
+            // Fail half the time in case of city 3
+            if (second % 2 == 0 && id == "3")
+            {
+                var fakeError = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent($"Fake error message"),
+                    ReasonPhrase = "Something went wrong here..."
+                };
+                throw new HttpResponseException(fakeError);
+
+            }
+
             if (MockDatabase.Cities.Any(c => c.Id == id))
             {
+                Thread.Sleep(2000); // fake a slow method
                 var items = MockDatabase.Schedules.Where(s => s.CityId == id);
                 return items.FirstOrDefault();
             }
